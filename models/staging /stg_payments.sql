@@ -9,7 +9,7 @@ WITH payments AS (
         created                 AS created_at,
         _batched_at
     
-    FROM raw.stripe.payment
+    FROM {{ source('stripe', 'payment') }}
 
 )
 

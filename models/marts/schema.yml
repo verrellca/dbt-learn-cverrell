@@ -1,0 +1,9 @@
+version: 2
+
+models:
+  - name: orders
+    description: This model joins staging models orders and payments
+    columns:
+      - name: order_id
+        tests:
+          - not_null
