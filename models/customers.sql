@@ -1,47 +1,37 @@
 {{config(materialized='table')}}
 
-with customers as (
+WITH customers AS (
 
-    select * from {{ ref('stg_customers') }}
+    SELECT 
+        customer_id
+        , first_name
+        , last_name
+
+    FROM {{ ref('stg_customers') }}
+),
+
+
+customers_orders_payments AS (
+
+    SELECT * FROM {{ ref('orders') }} WHERE payment_status = 'success'
 
 ),
 
-orders as (
+final AS (
 
-    select * from {{ ref('stg_orders') }}
-
-),
-
-customer_orders as (
-
-    select
-        customer_id,
-
+    SELECT
+        customers.customer_id,
         min(order_date) as first_order_date,
         max(order_date) as most_recent_order_date,
-        count(order_id) as number_of_orders
+        count(order_id) as number_of_orders,
+        sum(payment_amount) as life_time_value
 
-    from orders
+    FROM customers 
+    INNER JOIN customers_orders_payments ON customers_orders_payments.customer_id = customers.customer_id
 
-    group by 1
-
-),
-
-
-final as (
-
-    select
-        customers.customer_id,
-        customers.first_name,
-        customers.last_name,
-        customer_orders.first_order_date,
-        customer_orders.most_recent_order_date,
-        coalesce(customer_orders.number_of_orders, 0) as number_of_orders
-
-    from customers
-
-    left join customer_orders using (customer_id)
+    GROUP BY 1
 
 )
 
-select * from final
+SELECT * 
+FROM final
