@@ -22,7 +22,7 @@ models:
           - not_null
 
   - name: stg_orders
-    description: This model cleans up order data
+    description: This model cleans up order data into a staging table
     columns:
       - name: order_id
         description: Primary key
