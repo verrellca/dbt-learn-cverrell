@@ -13,7 +13,7 @@ WITH customers AS (
 
 customers_orders_payments AS (
 
-    SELECT * FROM {{ ref('orders') }} WHERE payment_status = 'success'
+    SELECT * FROM {{ ref('orders') }} 
 
 ),
 
@@ -24,7 +24,7 @@ final AS (
         min(order_date) as first_order_date,
         max(order_date) as most_recent_order_date,
         count(order_id) as number_of_orders,
-        sum(payment_amount) as life_time_value
+        sum(CASE WHEN payment_status = 'success' THEN payment_amount END) as life_time_value
 
     FROM customers 
     INNER JOIN customers_orders_payments ON customers_orders_payments.customer_id = customers.customer_id
